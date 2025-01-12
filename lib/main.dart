@@ -11,15 +11,34 @@ void main() => runApp(GameWidget(game: BrickBreakerGame()));
 
 final class BrickBreakerGame extends FlameGame
     with PanDetector, HasCollisionDetection {
-  final Paddle paddle = Paddle();
-  final Ball ball = Ball();
+  late final Paddle paddle;
+  late final Ball ball;
+  late List<Brick> bricks;
+
+  double get width => size.x;
+  double get height => size.y;
+  double get ballRadius => width * 0.02;
+  double get paddleLength => width * 0.2;
+  double get paddleHeight => ballRadius * 2;
+
+  bool gameStarted = false;
 
   @override
   Future<void> onLoad() async {
+    final backgroundImage = SpriteComponent(
+      sprite: Sprite(
+        await images.load('bricks-background.jpg'),
+        srcSize: Vector2(width, height),
+      ),
+    );
+    add(backgroundImage);
     add(ScreenHitbox());
+    paddle = Paddle(size: Vector2(paddleLength, paddleHeight));
     add(paddle);
+    ball = Ball(radius: ballRadius);
     add(ball);
-    addAll(getBricks());
+    bricks = getBricks();
+    addAll(bricks);
   }
 
   @override
@@ -29,42 +48,46 @@ final class BrickBreakerGame extends FlameGame
 
   @override
   void onPanStart(DragStartInfo info) {
-    ball.resetBall();
+    if (!gameStarted) {
+      ball.throwBall();
+      gameStarted = true;
+    }
+  }
+
+  void resetGame() {
+    resetBallAndPaddle();
+    resetBricks();
+  }
+
+  void resetBallAndPaddle() {
+    gameStarted = false;
+    ball.resetPosition();
+    ball.resetVelocity();
+    paddle.resetPosition();
+  }
+
+  void resetBricks() {
+    removeAll(children.query<Brick>());
+    addAll(bricks);
   }
 
   List<Brick> getBricks() {
-    // TODO: Générer les briques automatiquement.
-    return [
-      Brick(position: Vector2(0, 0)),
-      Brick(position: Vector2(96, 0)),
-      Brick(position: Vector2(192, 0)),
-      Brick(position: Vector2(288, 0)),
-      Brick(position: Vector2(384, 0)),
-      Brick(position: Vector2(480, 0)),
-      Brick(position: Vector2(576, 0)),
-      Brick(position: Vector2(672, 0)),
-      Brick(position: Vector2(768, 0)),
-      Brick(position: Vector2(864, 0)),
-      Brick(position: Vector2(0 - 48, 48)),
-      Brick(position: Vector2(96 - 48, 48)),
-      Brick(position: Vector2(192 - 48, 48)),
-      Brick(position: Vector2(288 - 48, 48)),
-      Brick(position: Vector2(384 - 48, 48)),
-      Brick(position: Vector2(480 - 48, 48)),
-      Brick(position: Vector2(576 - 48, 48)),
-      Brick(position: Vector2(672 - 48, 48)),
-      Brick(position: Vector2(768 - 48, 48)),
-      Brick(position: Vector2(864 - 48, 48)),
-      Brick(position: Vector2(0, 96)),
-      Brick(position: Vector2(96, 96)),
-      Brick(position: Vector2(192, 96)),
-      Brick(position: Vector2(288, 96)),
-      Brick(position: Vector2(384, 96)),
-      Brick(position: Vector2(480, 96)),
-      Brick(position: Vector2(576, 96)),
-      Brick(position: Vector2(672, 96)),
-      Brick(position: Vector2(768, 96)),
-      Brick(position: Vector2(864, 96)),
-    ];
+    final numberOfLines = 10;
+    final numberOfBricksPerLine = (width / brickWidth).floor();
+    final bricks = <Brick>[];
+
+    for (int line = 0; line < numberOfLines; line++) {
+      final numberOfBricks =
+          line.isOdd ? numberOfBricksPerLine - 1 : numberOfBricksPerLine;
+      for (int brick = 0; brick < numberOfBricks; brick++) {
+        final xPosition =
+            brick * brickWidth + (line.isOdd ? brickWidth / 2 : 0);
+        final yPosition = line * brickHeight;
+
+        bricks.add(Brick(position: Vector2(xPosition, yPosition)));
+      }
+    }
+
+    return bricks;
   }
 }

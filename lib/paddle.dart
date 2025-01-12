@@ -5,17 +5,25 @@ import 'package:holiday_break_hackaton/main.dart';
 
 final class Paddle extends RectangleComponent
     with HasGameReference<BrickBreakerGame> {
-  Paddle() : super(size: Vector2(250, 25), paint: BasicPalette.green.paint());
+  Paddle({required super.size})
+      : super(
+          paint: BasicPalette.green.paint(),
+          anchor: Anchor.center,
+        );
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-
-    position = Vector2(game.size.x / 2 - 125, game.size.y - 75);
+    resetPosition();
     add(RectangleHitbox(isSolid: true));
   }
 
+  void resetPosition() {
+    position = Vector2(game.width / 2, game.height * 0.95);
+  }
+
   void move(Vector2 delta) {
-    position.add(Vector2(delta.x, 0));
+    position.x = (position.x + delta.x)
+        .clamp(game.paddleLength / 2, game.width - game.paddleLength / 2);
   }
 }

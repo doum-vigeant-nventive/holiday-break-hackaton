@@ -10,35 +10,50 @@ import 'package:holiday_break_hackaton/paddle.dart';
 
 final class Ball extends CircleComponent
     with HasGameReference<BrickBreakerGame>, CollisionCallbacks {
-  Ball({super.position}) : super(radius: 20, paint: BasicPalette.blue.paint());
+  Ball({required super.radius})
+      : super(
+          paint: BasicPalette.white.paint(),
+          anchor: Anchor.center,
+        );
 
   static const double speed = 500;
   static const double degree = math.pi / 180;
 
   Vector2 velocity = Vector2.zero();
 
+  double get randomSpawnAngle =>
+      lerpDouble(0, 360, math.Random().nextDouble())!;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     resetPosition();
-    add(CircleHitbox(radius: 20));
+    add(CircleHitbox(radius: radius));
   }
 
   void resetPosition() {
-    position = Vector2(game.size.x / 2 - 10, game.size.y - 115);
+    position = Vector2(game.width / 2,
+        game.height * 0.95 - game.paddleHeight - game.ballRadius);
   }
 
-  void resetBall() {
-    resetPosition();
+  void resetVelocity() {
+    velocity = Vector2.zero();
+  }
+
+  void throwBall() {
     final spawnAngle = randomSpawnAngle;
+    // TODO: S'assurer que la balle parte toujours vers le haut.
     velocity = Vector2(
       math.cos(spawnAngle * degree) * speed,
       math.sin(spawnAngle * degree) * speed,
     );
   }
 
-  double get randomSpawnAngle =>
-      lerpDouble(0, 360, math.Random().nextDouble())!;
+  @override
+  void update(double dt) {
+    super.update(dt);
+    position += velocity * dt;
+  }
 
   @override
   void onCollisionStart(
@@ -51,12 +66,15 @@ final class Ball extends CircleComponent
 
     if (other is ScreenHitbox) {
       final isSideCollision = collisionPoint.x == 0 ||
-          collisionPoint.x.toStringAsFixed(1) == game.size.x.toStringAsFixed(1);
+          collisionPoint.x.toStringAsFixed(1) == game.width.toStringAsFixed(1);
+      final isTopCollision = collisionPoint.y == 0;
+
       if (isSideCollision) {
         velocity.x = -velocity.x;
-      } else {
-        // TODO: Game over si la balle touche le bas.
+      } else if (isTopCollision) {
         velocity.y = -velocity.y;
+      } else {
+        game.resetBallAndPaddle();
       }
     }
 
@@ -72,22 +90,17 @@ final class Ball extends CircleComponent
         velocity.y = -velocity.y;
       }
       other.removeFromParent();
+
+      if (game.children.query<Brick>().length == 1) {
+        game.resetGame();
+      }
     }
 
     if (other is Paddle) {
-      final topBorder = other.position.y;
-      final isTopCollision = collisionPoint.y == topBorder;
-
-      // TODO: Changer l'angle en fonction d'où sur le paddle ça atterit.
-      if (isTopCollision) {
-        velocity.y = -velocity.y;
-      }
+      // TODO: Améliorer l'angle en fonction d'où sur le paddle ça atterit.
+      velocity.y = -velocity.y;
+      velocity.x = velocity.x +
+          (position.x - other.position.x) / other.size.x * game.height * 0.3;
     }
-  }
-
-  @override
-  void update(double dt) {
-    super.update(dt);
-    position += velocity * dt;
   }
 }
