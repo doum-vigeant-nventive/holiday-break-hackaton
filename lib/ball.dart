@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'dart:ui'; 
+import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
