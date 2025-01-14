@@ -7,6 +7,7 @@ import 'package:flame/palette.dart';
 import 'package:holiday_break_hackaton/brick.dart';
 import 'package:holiday_break_hackaton/main.dart';
 import 'package:holiday_break_hackaton/paddle.dart';
+import 'package:holiday_break_hackaton/play_area.dart';
 
 final class Ball extends CircleComponent
     with HasGameReference<BrickBreakerGame>, CollisionCallbacks {
@@ -22,7 +23,7 @@ final class Ball extends CircleComponent
   Vector2 velocity = Vector2.zero();
 
   double get randomSpawnAngle =>
-      lerpDouble(0, 360, math.Random().nextDouble())!;
+      lerpDouble(-45, -135, math.Random().nextDouble())!;
 
   @override
   Future<void> onLoad() async {
@@ -42,7 +43,6 @@ final class Ball extends CircleComponent
 
   void throwBall() {
     final spawnAngle = randomSpawnAngle;
-    // TODO: S'assurer que la balle parte toujours vers le haut.
     velocity = Vector2(
       math.cos(spawnAngle * degree) * speed,
       math.sin(spawnAngle * degree) * speed,
@@ -64,10 +64,10 @@ final class Ball extends CircleComponent
 
     final collisionPoint = intersectionPoints.first;
 
-    if (other is ScreenHitbox) {
-      final isSideCollision = collisionPoint.x == 0 ||
+    if (other is PlayArea) {
+      final isSideCollision = collisionPoint.x <= 0 ||
           collisionPoint.x.toStringAsFixed(1) == game.width.toStringAsFixed(1);
-      final isTopCollision = collisionPoint.y == 0;
+      final isTopCollision = collisionPoint.y <= 0;
 
       if (isSideCollision) {
         velocity.x = -velocity.x;
@@ -76,13 +76,11 @@ final class Ball extends CircleComponent
       } else {
         game.resetBallAndPaddle();
       }
-    }
-
-    if (other is Brick) {
+    } else if (other is Brick) {
       final leftBorder = other.position.x;
       final rightBorder = leftBorder + other.width;
       final isSideCollision =
-          collisionPoint.x == leftBorder || collisionPoint.x == rightBorder;
+          collisionPoint.x <= leftBorder || collisionPoint.x >= rightBorder;
 
       if (isSideCollision) {
         velocity.x = -velocity.x;
@@ -94,13 +92,13 @@ final class Ball extends CircleComponent
       if (game.children.query<Brick>().length == 1) {
         game.resetGame();
       }
-    }
-
-    if (other is Paddle) {
+    } else if (other is Paddle) {
       // TODO: Améliorer l'angle en fonction d'où sur le paddle ça atterit.
       velocity.y = -velocity.y;
       velocity.x = velocity.x +
           (position.x - other.position.x) / other.size.x * game.height * 0.3;
+    } else {
+      throw Exception('Unknown collision');
     }
   }
 }

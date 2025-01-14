@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -6,11 +8,23 @@ import 'package:flutter/material.dart';
 import 'package:holiday_break_hackaton/ball.dart';
 import 'package:holiday_break_hackaton/brick.dart';
 import 'package:holiday_break_hackaton/paddle.dart';
+import 'package:holiday_break_hackaton/play_area.dart';
 
 void main() => runApp(GameWidget(game: BrickBreakerGame()));
 
+const double gameWidth = 410;
+const double gameHeight = 800;
+
 final class BrickBreakerGame extends FlameGame
     with PanDetector, HasCollisionDetection {
+  BrickBreakerGame()
+      : super(
+          camera: CameraComponent.withFixedResolution(
+            width: gameWidth,
+            height: gameHeight,
+          ),
+        );
+
   late final Paddle paddle;
   late final Ball ball;
   late List<Brick> bricks;
@@ -25,14 +39,32 @@ final class BrickBreakerGame extends FlameGame
 
   @override
   Future<void> onLoad() async {
+    camera.viewfinder.anchor = Anchor.topLeft;
+
+    add(PlayArea());
+
     final backgroundImage = SpriteComponent(
       sprite: Sprite(
         await images.load('bricks-background.jpg'),
         srcSize: Vector2(width, height),
       ),
     );
+
     add(backgroundImage);
-    add(ScreenHitbox());
+
+    // TODO: Descendre le papa noel.
+    final santa = SpriteComponent(
+      sprite: Sprite(
+        await images.load('Idle (2).png'),
+        srcSize: Vector2(width, height),
+      ),
+      scale: Vector2(0.3, 0.3),
+      position: Vector2(width / 2, 0),
+      anchor: Anchor.topCenter,
+    );
+
+    add(santa);
+
     paddle = Paddle(size: Vector2(paddleLength, paddleHeight));
     add(paddle);
     ball = Ball(radius: ballRadius);
@@ -75,14 +107,15 @@ final class BrickBreakerGame extends FlameGame
     final numberOfLines = 10;
     final numberOfBricksPerLine = (width / brickWidth).floor();
     final bricks = <Brick>[];
+    final buffer = (width - (numberOfBricksPerLine * brickWidth)) / 2;
 
     for (int line = 0; line < numberOfLines; line++) {
       final numberOfBricks =
           line.isOdd ? numberOfBricksPerLine - 1 : numberOfBricksPerLine;
       for (int brick = 0; brick < numberOfBricks; brick++) {
         final xPosition =
-            brick * brickWidth + (line.isOdd ? brickWidth / 2 : 0);
-        final yPosition = line * brickHeight;
+            brick * brickWidth + (line.isOdd ? brickWidth / 2 : 0) + buffer;
+        final yPosition = line * brickHeight + 173;
 
         bricks.add(Brick(position: Vector2(xPosition, yPosition)));
       }
