@@ -10,7 +10,7 @@ final class Wall extends SpriteComponent
   @override
   Future<void> onLoad() async {
     sprite = await Sprite.load(
-      'brick.png',
+      'wall2.png',
     );
 
     add(RectangleHitbox(isSolid: true));

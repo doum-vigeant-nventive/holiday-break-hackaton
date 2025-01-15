@@ -12,7 +12,7 @@ final class Brick extends SpriteComponent
   @override
   Future<void> onLoad() async {
     sprite = await Sprite.load(
-      'brick.png',
+      'brick4.png',
       srcSize: Vector2(brickWidth, brickHeight),
     );
 

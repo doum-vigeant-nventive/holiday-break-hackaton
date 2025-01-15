@@ -27,8 +27,8 @@ final class Ball extends SpriteComponent
   @override
   Future<void> onLoad() async {
     sprite = await Sprite.load(
-      'arrow.png',
-      srcSize: Vector2(brickWidth, brickHeight),
+      'elf.png',
+      srcSize: Vector2(48, 48),
     );
     await super.onLoad();
     resetPosition();

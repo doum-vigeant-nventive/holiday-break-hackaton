@@ -23,23 +23,17 @@ void main() => runApp(
         ),
         home: Scaffold(
           body: Container(
+            padding: const EdgeInsets.all(48),
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xffa9d6e5),
-                  Color(0xfff2e8cf),
-                ],
-              ),
+              image: DecorationImage(
+                  image: AssetImage('assets/images/back.png'),
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center),
             ),
             child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(48),
                 child: Center(
                   child: Column(
                     children: [
-                      const Text("Salut"),
                       Expanded(
                         child: FittedBox(
                           child: SizedBox(
@@ -58,8 +52,8 @@ void main() => runApp(
             ),
           ),
         ),
-      ),
     );
+
 
 final class BrickBreakerGame extends FlameGame
     with PanDetector, HasCollisionDetection {
@@ -93,6 +87,7 @@ final class BrickBreakerGame extends FlameGame
       sprite: Sprite(
         await images.load('bricks-background.jpg'),
         srcSize: Vector2(width, height),
+        srcPosition: Vector2(0.0, 0.0),
       ),
     );
 
@@ -148,7 +143,10 @@ final class BrickBreakerGame extends FlameGame
   List<Wall> getWalls() {
     final walls = <Wall>[];
     walls.add(Wall(position: Vector2(0.0, 0.0), width: 150.0, height: 450.0));
-    walls.add(Wall(position: Vector2(gameWidth - 150.0, 0.0), width: 150.0, height: 450.0));
+    walls.add(Wall(
+        position: Vector2(gameWidth - 150.0, 0.0),
+        width: 150.0,
+        height: 450.0));
     return walls;
   }
 
