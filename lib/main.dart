@@ -23,7 +23,7 @@ void main() => runApp(
         ),
         home: Scaffold(
           body: Container(
-            padding: const EdgeInsets.all(48),
+            // padding: const EdgeInsets.all(48),
             decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage('assets/images/back.png'),
