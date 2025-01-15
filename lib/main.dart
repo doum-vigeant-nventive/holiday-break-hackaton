@@ -9,11 +9,57 @@ import 'package:holiday_break_hackaton/ball.dart';
 import 'package:holiday_break_hackaton/brick.dart';
 import 'package:holiday_break_hackaton/paddle.dart';
 import 'package:holiday_break_hackaton/play_area.dart';
+import 'package:holiday_break_hackaton/santa.dart';
+import 'package:holiday_break_hackaton/wall.dart';
 
-void main() => runApp(GameWidget(game: BrickBreakerGame()));
+const double gameWidth = 800;
+const double gameHeight = 900;
 
-const double gameWidth = 410;
-const double gameHeight = 800;
+void main() => runApp(
+      MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+        ),
+        home: Scaffold(
+          body: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Color(0xffa9d6e5),
+                  Color(0xfff2e8cf),
+                ],
+              ),
+            ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(48),
+                child: Center(
+                  child: Column(
+                    children: [
+                      const Text("Salut"),
+                      Expanded(
+                        child: FittedBox(
+                          child: SizedBox(
+                            width: gameWidth,
+                            height: gameHeight,
+                            child: GameWidget(
+                              game: BrickBreakerGame(),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
 
 final class BrickBreakerGame extends FlameGame
     with PanDetector, HasCollisionDetection {
@@ -28,6 +74,7 @@ final class BrickBreakerGame extends FlameGame
   late final Paddle paddle;
   late final Ball ball;
   late List<Brick> bricks;
+  late final Santa santa;
 
   double get width => size.x;
   double get height => size.y;
@@ -42,7 +89,6 @@ final class BrickBreakerGame extends FlameGame
     camera.viewfinder.anchor = Anchor.topLeft;
 
     add(PlayArea());
-
     final backgroundImage = SpriteComponent(
       sprite: Sprite(
         await images.load('bricks-background.jpg'),
@@ -51,23 +97,14 @@ final class BrickBreakerGame extends FlameGame
     );
 
     add(backgroundImage);
+    addAll(getWalls());
 
-    // TODO: Descendre le papa noel..
-    final santa = SpriteComponent(
-      sprite: Sprite(
-        await images.load('Idle (2).png'),
-        srcSize: Vector2(width, height),
-      ),
-      scale: Vector2(0.3, 0.3),
-      position: Vector2(width / 2, 0),
-      anchor: Anchor.topCenter,
-    );
-
+    santa = Santa(size: Vector2(500.0, 200.0), position: Vector2(width / 2, 0));
     add(santa);
 
     paddle = Paddle(size: Vector2(paddleLength, paddleHeight));
     add(paddle);
-    ball = Ball(radius: ballRadius);
+    ball = Ball(size: ballRadius);
     add(ball);
     bricks = getBricks();
     addAll(bricks);
@@ -86,7 +123,12 @@ final class BrickBreakerGame extends FlameGame
     }
   }
 
-  void resetGame() {
+  Future<void> winGame() async {
+    santa.animateDescent();
+    remove(ball);
+    await Future.delayed(const Duration(seconds: 4));
+    santa.resetPosition(Vector2(width / 2, 0));
+    add(ball);
     resetBallAndPaddle();
     resetBricks();
   }
@@ -103,9 +145,16 @@ final class BrickBreakerGame extends FlameGame
     addAll(bricks);
   }
 
+  List<Wall> getWalls() {
+    final walls = <Wall>[];
+    walls.add(Wall(position: Vector2(0.0, 0.0), width: 150.0, height: 450.0));
+    walls.add(Wall(position: Vector2(gameWidth - 150.0, 0.0), width: 150.0, height: 450.0));
+    return walls;
+  }
+
   List<Brick> getBricks() {
     final numberOfLines = 10;
-    final numberOfBricksPerLine = (width / brickWidth).floor();
+    final numberOfBricksPerLine = 10;
     final bricks = <Brick>[];
     final buffer = (width - (numberOfBricksPerLine * brickWidth)) / 2;
 
@@ -115,7 +164,7 @@ final class BrickBreakerGame extends FlameGame
       for (int brick = 0; brick < numberOfBricks; brick++) {
         final xPosition =
             brick * brickWidth + (line.isOdd ? brickWidth / 2 : 0) + buffer;
-        final yPosition = line * brickHeight + 173;
+        final yPosition = line * brickHeight + 200;
 
         bricks.add(Brick(position: Vector2(xPosition, yPosition)));
       }

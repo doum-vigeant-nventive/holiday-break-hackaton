@@ -3,21 +3,20 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/palette.dart';
 import 'package:holiday_break_hackaton/brick.dart';
 import 'package:holiday_break_hackaton/main.dart';
 import 'package:holiday_break_hackaton/paddle.dart';
 import 'package:holiday_break_hackaton/play_area.dart';
+import 'package:holiday_break_hackaton/wall.dart';
 
-final class Ball extends CircleComponent
+final class Ball extends SpriteComponent
     with HasGameReference<BrickBreakerGame>, CollisionCallbacks {
-  Ball({required super.radius})
+  Ball({required size})
       : super(
-          paint: BasicPalette.white.paint(),
           anchor: Anchor.center,
         );
 
-  static const double speed = 500;
+  static const double speed = 450;
   static const double degree = math.pi / 180;
 
   Vector2 velocity = Vector2.zero();
@@ -27,9 +26,13 @@ final class Ball extends CircleComponent
 
   @override
   Future<void> onLoad() async {
+    sprite = await Sprite.load(
+      'arrow.png',
+      srcSize: Vector2(brickWidth, brickHeight),
+    );
     await super.onLoad();
     resetPosition();
-    add(CircleHitbox(radius: radius));
+    add(CircleHitbox());
   }
 
   void resetPosition() {
@@ -53,6 +56,8 @@ final class Ball extends CircleComponent
   void update(double dt) {
     super.update(dt);
     position += velocity * dt;
+
+    angle = velocity.screenAngle();
   }
 
   @override
@@ -76,6 +81,17 @@ final class Ball extends CircleComponent
       } else {
         game.resetBallAndPaddle();
       }
+    } else if (other is Wall) {
+      final leftBorder = other.position.x;
+      final rightBorder = leftBorder + other.width;
+      final isSideCollision =
+          collisionPoint.x <= leftBorder || collisionPoint.x >= rightBorder;
+      if (isSideCollision) {
+        velocity.x = -velocity.x;
+      } else {
+        velocity.y = -velocity.y;
+      }
+
     } else if (other is Brick) {
       final leftBorder = other.position.x;
       final rightBorder = leftBorder + other.width;
@@ -90,7 +106,7 @@ final class Ball extends CircleComponent
       other.removeFromParent();
 
       if (game.children.query<Brick>().length == 1) {
-        game.resetGame();
+        game.winGame();
       }
     } else if (other is Paddle) {
       // TODO: Améliorer l'angle en fonction d'où sur le paddle ça atterit.
@@ -100,5 +116,9 @@ final class Ball extends CircleComponent
     } else {
       throw Exception('Unknown collision');
     }
+  }
+
+  void hide() {
+    removeFromParent();
   }
 }
