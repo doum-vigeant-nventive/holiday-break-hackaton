@@ -52,7 +52,7 @@ final class BrickBreakerGame extends FlameGame
 
     add(backgroundImage);
 
-    // TODO: Descendre le papa noel.
+    // TODO: Descendre le papa noel..
     final santa = SpriteComponent(
       sprite: Sprite(
         await images.load('Idle (2).png'),
