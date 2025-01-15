@@ -74,7 +74,7 @@ final class BrickBreakerGame extends FlameGame
   double get height => size.y;
   double get ballRadius => width * 0.02;
   double get paddleLength => width * 0.2;
-  double get paddleHeight => ballRadius * 2;
+  double get paddleHeight => 48;
 
   bool gameStarted = false;
 

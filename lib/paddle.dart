@@ -1,19 +1,23 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/palette.dart';
 import 'package:holiday_break_hackaton/main.dart';
 
-final class Paddle extends RectangleComponent
+final class Paddle extends SpriteComponent
     with HasGameReference<BrickBreakerGame> {
   Paddle({required super.size})
       : super(
-          paint: BasicPalette.green.paint(),
           anchor: Anchor.center,
         );
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
+
+     sprite = await Sprite.load(
+      'paddle.png',
+      srcSize: Vector2(160, 48),
+    );
+
     resetPosition();
     add(RectangleHitbox(isSolid: true));
   }
