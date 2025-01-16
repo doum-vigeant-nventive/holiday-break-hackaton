@@ -3,6 +3,9 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+
+import 'package:flame_audio/flame_audio.dart';
+
 import 'package:holiday_break_hackaton/brick.dart';
 import 'package:holiday_break_hackaton/main.dart';
 import 'package:holiday_break_hackaton/paddle.dart';
@@ -109,7 +112,7 @@ final class Ball extends SpriteComponent
         game.winGame();
       }
     } else if (other is Paddle) {
-      // TODO: Améliorer l'angle en fonction d'où sur le paddle ça atterit.
+      FlameAudio.play('boing.wav');
       velocity.y = -velocity.y;
       velocity.x = velocity.x +
           (position.x - other.position.x) / other.size.x * game.height * 0.3;
