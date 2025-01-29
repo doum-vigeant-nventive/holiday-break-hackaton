@@ -31,29 +31,28 @@ void main() => runApp(
                   alignment: Alignment.center),
             ),
             child: SafeArea(
-                child: Center(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: FittedBox(
-                          child: SizedBox(
-                            width: gameWidth,
-                            height: gameHeight,
-                            child: GameWidget(
-                              game: BrickBreakerGame(),
-                            ),
+              child: Center(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: FittedBox(
+                        child: SizedBox(
+                          width: gameWidth,
+                          height: gameHeight,
+                          child: GameWidget(
+                            game: BrickBreakerGame(),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
+      ),
     );
-
 
 final class BrickBreakerGame extends FlameGame
     with PanDetector, HasCollisionDetection {
@@ -94,7 +93,7 @@ final class BrickBreakerGame extends FlameGame
     add(backgroundImage);
     addAll(getWalls());
 
-    santa = Santa(size: Vector2(500.0, 200.0), position: Vector2(width / 2, 0));
+    santa = Santa(size: Vector2(200.0, 200.0), position: Vector2(width / 2, 0));
     add(santa);
 
     paddle = Paddle(size: Vector2(paddleLength, paddleHeight));
