@@ -1,19 +1,16 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:holiday_break_hackaton/main.dart';
+import 'package:holiday_break_hackaton/brick_breaker_game.dart';
 
 final class Paddle extends SpriteComponent
     with HasGameReference<BrickBreakerGame> {
-  Paddle({required super.size})
-      : super(
-          anchor: Anchor.center,
-        );
+  Paddle({required super.size}) : super(anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
     await super.onLoad();
 
-     sprite = await Sprite.load(
+    sprite = await Sprite.load(
       'paddle.png',
       srcSize: Vector2(160, 48),
     );

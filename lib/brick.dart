@@ -1,6 +1,6 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:holiday_break_hackaton/main.dart';
+import 'package:holiday_break_hackaton/brick_breaker_game.dart';
 
 const double brickWidth = 48;
 const double brickHeight = 24;

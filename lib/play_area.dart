@@ -1,8 +1,9 @@
 import 'dart:async';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'package:holiday_break_hackaton/main.dart';
+import 'package:holiday_break_hackaton/brick_breaker_game.dart';
 
 final class PlayArea extends RectangleComponent
     with HasGameReference<BrickBreakerGame> {

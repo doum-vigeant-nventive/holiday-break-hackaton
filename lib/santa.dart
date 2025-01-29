@@ -1,21 +1,20 @@
 import 'package:flame/components.dart';
-import 'package:holiday_break_hackaton/main.dart';
+import 'package:holiday_break_hackaton/brick_breaker_game.dart';
 
 final class Santa extends SpriteComponent
     with HasGameReference<BrickBreakerGame> {
-  Santa({required super.position, required Vector2 size}) : super(size: size, anchor: Anchor.topCenter);
+  Santa({required super.position, required Vector2 size})
+      : super(size: size, anchor: Anchor.topCenter);
 
   final double speed = 450; // Movement speed in pixels per second
-  final Vector2 target = Vector2(400.0, 600.0); 
+  final Vector2 target = Vector2(400.0, 600.0);
 
   Vector2? targetPosition; // The position to move towards
   Vector2? _direction; // Direction of movement
 
   @override
   Future<void> onLoad() async {
-    sprite = await Sprite.load(
-      'Idle (2).png',
-    );
+    sprite = await Sprite.load('Idle (2).png');
   }
 
   void animateDescent() {
@@ -23,7 +22,7 @@ final class Santa extends SpriteComponent
     _direction = (target - position).normalized(); // Calculate direction
   }
 
-    @override
+  @override
   void update(double dt) {
     super.update(dt);
 
@@ -42,9 +41,8 @@ final class Santa extends SpriteComponent
       position.add(movement);
     }
   }
-  
+
   void resetPosition(Vector2 newPosition) {
     position.setFrom(newPosition);
   }
-
 }

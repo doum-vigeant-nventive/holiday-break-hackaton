@@ -3,21 +3,16 @@ import 'dart:ui';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-
 import 'package:flame_audio/flame_audio.dart';
-
 import 'package:holiday_break_hackaton/brick.dart';
-import 'package:holiday_break_hackaton/main.dart';
+import 'package:holiday_break_hackaton/brick_breaker_game.dart';
 import 'package:holiday_break_hackaton/paddle.dart';
 import 'package:holiday_break_hackaton/play_area.dart';
 import 'package:holiday_break_hackaton/wall.dart';
 
 final class Ball extends SpriteComponent
     with HasGameReference<BrickBreakerGame>, CollisionCallbacks {
-  Ball({required size})
-      : super(
-          anchor: Anchor.center,
-        );
+  Ball({required size}) : super(anchor: Anchor.center);
 
   static const double speed = 450;
   static const double degree = math.pi / 180;
@@ -39,8 +34,10 @@ final class Ball extends SpriteComponent
   }
 
   void resetPosition() {
-    position = Vector2(game.width / 2,
-        game.height * 0.95 - game.paddleHeight - game.ballRadius);
+    position = Vector2(
+      game.width / 2,
+      game.height * 0.95 - game.paddleHeight - game.ballRadius,
+    );
   }
 
   void resetVelocity() {
@@ -59,7 +56,6 @@ final class Ball extends SpriteComponent
   void update(double dt) {
     super.update(dt);
     position += velocity * dt;
-
     angle = velocity.screenAngle();
   }
 
@@ -94,7 +90,6 @@ final class Ball extends SpriteComponent
       } else {
         velocity.y = -velocity.y;
       }
-
     } else if (other is Brick) {
       final leftBorder = other.position.x;
       final rightBorder = leftBorder + other.width;
@@ -119,9 +114,5 @@ final class Ball extends SpriteComponent
     } else {
       throw Exception('Unknown collision');
     }
-  }
-
-  void hide() {
-    removeFromParent();
   }
 }
